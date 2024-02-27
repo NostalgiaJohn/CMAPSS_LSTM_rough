@@ -4,6 +4,7 @@ import numpy as np
 from loading_data import *
 from model import *
 from visualize import *
+from torch.autograd import Variable
 
 def testing_function(model, num, group_for_test):
     rmse_test, result_test = 0, list()
@@ -60,7 +61,7 @@ def train(model_for_train, ntrain, group_for_train):
             model_for_train.eval()  # evaluate model
             result, rmse = testing_function(model_for_train, num_test, group_test)
 
-            if rmse_temp < rmse and rmse_temp < 10:
+            if rmse_temp < rmse and rmse_temp < 24:
                 result, rmse = result_temp, rmse_temp
                 break
 
