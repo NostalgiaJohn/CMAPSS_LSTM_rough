@@ -56,13 +56,13 @@ class LSTM1(nn.Module):
         # """
         # h_0 = Variable(torch.zeros(self.num_layers, x.size(0), self.hidden_size, device=DEVICE))  # hidden state
         # c_0 = Variable(torch.zeros(self.num_layers, x.size(0), self.hidden_size, device=DEVICE))  # internal state
-        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size, device=DEVICE)  # hidden state
-        c_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size, device=DEVICE)  # internal state
+        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(DEVICE)  # hidden state
+        c_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(DEVICE)  # internal state
 
         output, (hn, cn) = self.lstm(x, (h_0, c_0))  # lstm with input, hidden, and internal state
-        hn_o = torch.tensor(hn.cpu().detach().numpy()[-1, :, :], device=DEVICE)
+        hn_o = torch.tensor(hn.to(CPU).detach().numpy()[-1, :, :]).to(DEVICE)
         hn_o = hn_o.view(-1, self.hidden_size)
-        hn_1 = torch.tensor(hn.cpu().detach().numpy()[ 1, :, :], device=DEVICE)
+        hn_1 = torch.tensor(hn.to(CPU).detach().numpy()[ 1, :, :]).to(DEVICE)
         hn_1 = hn_1.view(-1, self.hidden_size)
 
         # out = self.relu(self.fc_1(self.relu(hn_o + hn_1)))

@@ -14,5 +14,4 @@ DEVICE = (
     if torch.backends.mps.is_available()
     else "cpu"
 )
-# CPU
-# DEVICE = "cpu"
+CPU = "cpu"
