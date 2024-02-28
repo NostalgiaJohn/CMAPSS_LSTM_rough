@@ -26,9 +26,9 @@ def testing_function(model, num, group_for_test):
     return result_test, rmse_test
 
 
-def train(model_for_train, ntrain, group_for_train):
+def train(LSTM_model, ntrain, group_for_train):
     """
-    :param model_for_train: initialized model
+    :param LSTM_model: initialized model
     :param ntrain: number of samples in training set
     :param group_for_train: grouped data per sample
     :return: evaluation results
@@ -38,21 +38,52 @@ def train(model_for_train, ntrain, group_for_train):
 
     for epoch in range(1, N_EPOCH + 1):
 
-        model_for_train.train()
+        LSTM_model.train() # train model
+        """
+        set/resume LSTM_model_to_train in training mode by enabling:
+            1. Dropout;
+            2. Batch normalization;
+            3. Gradient Computation;
+            4. Updating parameters;
+        REMIND: use (model name).eval() to evaluate
+        """
+
         epoch_loss = 0
 
         for i in range(1, ntrain + 1):
             X, y = group_for_train.get_group(i).iloc[:, 2:-1], group_for_train.get_group(i).iloc[:, -1:]
+
             # X_train_tensors = Variable(torch.tensor(X.to_numpy(), device=DEVICE))
             # y_train_tensors = Variable(torch.tensor(y.to_numpy(), device=DEVICE))
-            X_train_tensors = torch.tensor(X.to_numpy()).to(DEVICE)
-            y_train_tensors = torch.tensor(y.to_numpy()).to(DEVICE)
-            X_train_tensors = torch.reshape(X_train_tensors, (X_train_tensors.shape[0], 1, X_train_tensors.shape[1]))
+            # X_train_tensors = torch.tensor(X.to_numpy()).to(DEVICE)
+            # y_train_tensors = torch.tensor(y.to_numpy()).to(DEVICE)
+            X_train_tensors = torch.Tensor(X.to_numpy()).to(DEVICE)
+            y_train_tensors = torch.Tensor(y.to_numpy()).to(DEVICE)
+            """
+            1.    X and y are instances of DataFrame type, and
+                    (DataFrame).to_numpy() method will convert 
+                    them to numpy array type.
+            2.    torch.Tensor() is different from torch.tensor(). 
+                    torch.Tensor() will  return a tensor whose
+                    data type is determined by 
+                    torch.get_default_tensor_type(), while
+                    torch.tensor() is a function that constructs
+                    a tensor with actual data, inferring an
+                    automatically determined tensor type.
+                  REMIND: using torch.tensor() here leads to
+                    incorrect data type, and the following two
+                    lines of code is needed to solve it.  
+            """
+            # X_train_tensors = X_train_tensors.float()
+            # y_train_tensors = y_train_tensors.float()
 
-            X_train_tensors = X_train_tensors.float()
-            y_train_tensors = y_train_tensors.float()
+            X_train_tensors = torch.reshape(
+                X_train_tensors,
+                (X_train_tensors.shape[0], 1, X_train_tensors.shape[1])
+                # re-arange into (batch_size, sequence_length, input_size/feature)
+            )
 
-            outputs = model_for_train(X_train_tensors)  # forward pass
+            outputs = LSTM_model(X_train_tensors)  # forward pass
 
             optimizer.zero_grad()  # calculate the gradient, manually setting to 0
             loss = criterion(outputs, y_train_tensors)  # obtain the loss function
@@ -62,8 +93,16 @@ def train(model_for_train, ntrain, group_for_train):
 
         if epoch % 1 == 0:  # evaluate the model on testing set with each epoch
 
-            model_for_train.eval()  # evaluate model
-            result, rmse = testing_function(model_for_train, num_test, group_test)
+            LSTM_model.eval()  # evaluate model
+            """
+            set/resume LSTM_model in evaluating mode by disabling:
+                1. Dropout;
+                2. Batch normalization;
+                3. Gradient Computation;
+                4. Updating parameters;
+            """
+
+            result, rmse = testing_function(LSTM_model, num_test, group_test)
 
             if rmse_temp < rmse and rmse_temp < 24:
                 result, rmse = result_temp, rmse_temp
@@ -83,7 +122,7 @@ if __name__ == "__main__":
     # fetch basic information from data sets
     group, group_test, y_test = load_FD001(MAX)
     num_train, num_test = len(group.size()), len(group_test.size())
-    input_size = group.get_group(1).shape[1] - 3  # number of features
+    input_size = group.get_group(1).shape[1] - 3  # number of real features
 
     # LSTM model initialization
     # model = LSTM1(input_size, N_HIDDEN, N_LAYER) # our lstm class
