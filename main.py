@@ -87,7 +87,14 @@ def train(LSTM_model, ntrain, group_for_train):
 
             optimizer.zero_grad()  # calculate the gradient, manually setting to 0
             loss = criterion(outputs, y_train_tensors)  # obtain the loss function
+
+            # SOLVED: figure out why epoch_loss should be accumulated
             epoch_loss += loss.item()
+            """
+            here every engine model will be trained for 100 times and
+            the loss will be accumulated for each epoch in epoch_loss
+            """
+
             loss.backward()  # calculates the loss of the loss function
             optimizer.step()  # improve from loss, i.e back propagation
 
@@ -108,7 +115,7 @@ def train(LSTM_model, ntrain, group_for_train):
                 result, rmse = result_temp, rmse_temp
                 break
 
-            rmse_temp, result_temp = rmse, result  # store the last rmse
+            rmse_temp, result_temp = rmse, result  # store the last rmse for
             print("Epoch: %d, loss: %1.5f, rmse: %1.5f" % (epoch, epoch_loss / ntrain, rmse))
 
     return result, rmse
