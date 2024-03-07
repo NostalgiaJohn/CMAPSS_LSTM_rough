@@ -20,9 +20,9 @@ class LSTM1(nn.Module):
             input_size=input_size,
             hidden_size=hidden_size,
             num_layers=num_layers,
-            batch_first=True, # this option will change input data arangement from
-                              # (sequence_length, batch_size, input_size/feature) to
-                              # (batch_size, sequence_length, input_size/feature)
+            batch_first=True, # REMIND: this option will change input data arangement from
+                              #     (sequence_length, batch_size, input_size/feature) to
+                              #     (batch_size, sequence_length, input_size/feature)
             dropout=0.1
         )
         # self.fc_1 = nn.Linear(hidden_size, 16)  # fully connected 1
@@ -63,10 +63,11 @@ class LSTM1(nn.Module):
         # c_0 = Variable(torch.zeros(self.num_layers, x.size(0), self.hidden_size, device=DEVICE))  # internal state
         h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(DEVICE)  # hidden state
         c_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(DEVICE)  # internal state
-        """
-        Here torch.rand or torch.randn is not recommended for h_0's and c_0's
-        initialization, cuz it may cause gradient vanishing and explosing problems.
-        """
+        # REMIND:
+        #   """
+        #   Here torch.rand or torch.randn is not recommended for h_0's and c_0's
+        #   initialization, cuz it may cause gradient vanishing and explosing problems.
+        #   """
 
         output, (hn, cn) = self.lstm(x, (h_0, c_0))  # lstm with input, hidden, and internal state
         hn_o = torch.tensor(hn.to(CPU).detach().numpy()[-1, :, :]).to(DEVICE)

@@ -59,21 +59,23 @@ def train(LSTM_model, ntrain, group_for_train):
             # y_train_tensors = torch.tensor(y.to_numpy()).to(DEVICE)
             X_train_tensors = torch.Tensor(X.to_numpy()).to(DEVICE)
             y_train_tensors = torch.Tensor(y.to_numpy()).to(DEVICE)
-            """
-            1.    X and y are instances of DataFrame type, and
-                    (DataFrame).to_numpy() method will convert 
-                    them to numpy array type.
-            2.    torch.Tensor() is different from torch.tensor(). 
-                    torch.Tensor() will  return a tensor whose
-                    data type is determined by 
-                    torch.get_default_tensor_type(), while
-                    torch.tensor() is a function that constructs
-                    a tensor with actual data, inferring an
-                    automatically determined tensor type.
-                  REMIND: using torch.tensor() here leads to
-                    incorrect data type, and the following two
-                    lines of code is needed to solve it.  
-            """
+            # REMIND
+            #   """
+            #   1.    X and y are instances of DataFrame type, and
+            #         (DataFrame).to_numpy() method will convert
+            #         them to numpy array type.
+            #   2.    torch.Tensor() is different from torch.tensor().
+            #         torch.Tensor() will  return a tensor whose
+            #         data type is determined by
+            #         torch.get_default_tensor_type(), while
+            #         torch.tensor() is a function that constructs
+            #         a tensor with actual data, inferring an
+            #         automatically determined tensor type.
+            #       REMIND: using torch.tensor() here leads to
+            #         incorrect data type, and the following two
+            #         lines of code is needed to solve it.
+            #   """
+
             # X_train_tensors = X_train_tensors.float()
             # y_train_tensors = y_train_tensors.float()
 
@@ -90,10 +92,11 @@ def train(LSTM_model, ntrain, group_for_train):
 
             # SOLVED: figure out why epoch_loss should be accumulated
             epoch_loss += loss.item()
-            """
-            here every engine model will be trained for 100 times and
-            the loss will be accumulated for each epoch in epoch_loss
-            """
+            # REMIND
+            #   """
+            #   here every engine model will be trained for 100 times and
+            #   the loss will be accumulated for each epoch in epoch_loss
+            #   """
 
             loss.backward()  # calculates the loss of the loss function
             optimizer.step()  # improve from loss, i.e back propagation
@@ -101,13 +104,14 @@ def train(LSTM_model, ntrain, group_for_train):
         if epoch % 1 == 0:  # evaluate the model on testing set with each epoch
 
             LSTM_model.eval()  # evaluate model
-            """
-            set/resume LSTM_model in evaluating mode by disabling:
-                1. Dropout;
-                2. Batch normalization;
-                3. Gradient Computation;
-                4. Updating parameters;
-            """
+            # REMIND:
+            #   """
+            #   set/resume LSTM_model in evaluating mode by disabling:
+            #     1. Dropout;
+            #     2. Batch normalization;
+            #     3. Gradient Computation;
+            #     4. Updating parameters;
+            #   """
 
             result, rmse = testing_function(LSTM_model, num_test, group_test)
 

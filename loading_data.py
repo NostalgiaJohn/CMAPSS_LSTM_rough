@@ -43,6 +43,9 @@ def load_FD001(cut):
     train = pd.read_csv((dir_path + 'train_FD001.txt'), sep='\s+', header=None, names=col_names)
     test = pd.read_csv((dir_path + 'test_FD001.txt'), sep='\s+', header=None, names=col_names)
     y_test = pd.read_csv((dir_path + 'RUL_FD001.txt'), sep='\s+', header=None, names=['RUL'])
+    # train = pd.read_csv((dir_path + 'train_FD004.txt'), sep='\s+', header=None, names=col_names)
+    # test = pd.read_csv((dir_path + 'test_FD004.txt'), sep='\s+', header=None, names=col_names)
+    # y_test = pd.read_csv((dir_path + 'RUL_FD004.txt'), sep='\s+', header=None, names=['RUL'])
 
     # drop non-informative features, derived from EDA
     drop_sensors = ['s_1', 's_5', 's_10', 's_16', 's_18', 's_19']
